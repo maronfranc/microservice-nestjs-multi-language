@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package log;
+
+service LogController {
+  rpc SaveLog (UserData) returns (ReturnMessage);
+}
+
+message UserData {
+  string username = 1;
+  string url = 2;
+  string query = 3;
+  string datetime = 4;
+}
+
+message ReturnMessage {
+  string msg = 1;
+}
