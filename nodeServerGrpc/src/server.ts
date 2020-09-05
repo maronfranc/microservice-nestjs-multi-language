@@ -14,15 +14,22 @@ const appProto = grpc.loadPackageDefinition(packageDefinition);
 
 const server = new grpc.Server();
 
-const accumulate = (data: number[]) => {
-    return (data || []).reduce((a, b) => Number(a) + Number(b));
+interface ISendData {
+    sum: number
 }
+
+interface IData {
+    data: number[];
+}   
+
+const accumulate = (data: number[]): number => (data || []).reduce((a, b) => Number(a) + Number(b), 0);
 
 // @ts-ignore
 server.addService(appProto.app.AppController.service, {
-    accumulate: (numberArray, callback) => {
-        const response = accumulate(numberArray.request.data)
-
+    accumulate: (serverCall: grpc.ServerUnaryCall<IData>, callback: grpc.sendUnaryData<ISendData>) => {
+        console.log("Received: ", serverCall.request.data);
+        const response = accumulate(serverCall.request.data)
+        console.log("Sending: ", response);
         callback(null, { sum: response });
     },
 });
