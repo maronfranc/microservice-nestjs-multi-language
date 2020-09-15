@@ -1,5 +1,5 @@
 import { Body, Controller, Inject, OnModuleInit, Post, Req, Res, UseFilters } from '@nestjs/common';
-import { Client, ClientGrpc, ClientProxy } from '@nestjs/microservices';
+import { Client, ClientGrpc, ClientProxy, MessagePattern } from '@nestjs/microservices';
 import { Request, Response } from "express";
 import { timeout } from "rxjs/operators";
 import { IGrpcLogService, IGrpcService } from './grpc.interface';
@@ -28,7 +28,7 @@ export class AppController implements OnModuleInit {
   @UseFilters(new ExceptionFilter())
   @Post('add')
   async logObservable(@Body('data') data: number[], @Req() req: Request, @Res() res: Response) {
-    const nestjsQueueResponse$ = this.queueClient.emit("Emit pattern from Nestjs", {
+    const nestjsQueueResponse$ = this.queueClient.emit("notify-event-pattern", {
       text: "Message from Nestjs",
       date: new Date()
     });
@@ -50,5 +50,11 @@ export class AppController implements OnModuleInit {
       (error) => console.error(error),
       () => console.info('Microservice accumulate request completed')
     );
+  }
+
+  @MessagePattern("notify-event-pattern")
+  public async eventHandler(data: Record<string, unknown>): Promise<void> {
+    console.log(" ----- ----- |-Message event-| ----- ----- ");
+    console.log(data)
   }
 }
