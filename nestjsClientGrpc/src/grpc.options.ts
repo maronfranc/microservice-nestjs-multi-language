@@ -1,4 +1,4 @@
-import { ClientOptions, Transport } from '@nestjs/microservices';
+import { ClientOptions, ClientProviderOptions, Transport } from '@nestjs/microservices';
 import { join } from 'path';
 
 export const microserviceOptions: ClientOptions = {
@@ -18,3 +18,17 @@ export const logMicroserviceOptions: ClientOptions = {
     protoPath: join(__dirname, '../src/proto/log.proto'),
   },
 };
+
+export const queueMicroserviceOptions: ClientOptions = {
+  transport: Transport.RMQ,
+  options: {
+    urls: ["amqp://guest:guest@localhost:5672/"],
+    queue: "microservice_event",
+    queueOptions: { durable: false },
+  },
+}
+
+export const queueProviderOptions: ClientProviderOptions = {
+  ...queueMicroserviceOptions,
+  name: "QUEUE_MODULE_NAME"
+}
