@@ -28,7 +28,8 @@ export const queueMicroserviceOptions: ClientOptions = {
   },
 }
 
+export const QUEUE_CLIENT_MODULE_NAME = "QUEUE_CLIENT_MODULE_NAME"
 export const queueProviderOptions: ClientProviderOptions = {
   ...queueMicroserviceOptions,
-  name: "QUEUE_MODULE_NAME"
+  name: QUEUE_CLIENT_MODULE_NAME
 }

@@ -3,14 +3,14 @@ import { Client, ClientGrpc, ClientProxy, MessagePattern } from '@nestjs/microse
 import { Request, Response } from "express";
 import { timeout } from "rxjs/operators";
 import { IGrpcLogService, IGrpcService } from './grpc.interface';
-import { logMicroserviceOptions, microserviceOptions } from './grpc.options';
+import { logMicroserviceOptions, microserviceOptions, QUEUE_CLIENT_MODULE_NAME } from './grpc.options';
 import { ExceptionFilter } from './rpc-exception.filter';
 
 const FIVE_SECONDS = 5000;
 
 @Controller()
 export class AppController implements OnModuleInit {
-  public constructor(@Inject("QUEUE_MODULE_NAME") private readonly queueClient: ClientProxy) {}
+  public constructor(@Inject(QUEUE_CLIENT_MODULE_NAME) private readonly queueClient: ClientProxy) {}
 
   @Client(microserviceOptions)
   private client: ClientGrpc;
