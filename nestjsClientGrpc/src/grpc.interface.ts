@@ -18,3 +18,14 @@ interface ILogData {
   query: string;
   datetime: string;
 }
+
+export interface IGrpcRustService {
+  calc(number: NumberRequest): Observable<FibonacciResponse>;
+}
+
+interface NumberRequest {
+  number: number;
+}
+interface FibonacciResponse {
+  fibonacci: number;
+}

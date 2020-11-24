@@ -2,15 +2,15 @@ import { Body, Controller, Inject, OnModuleInit, Post, Req, Res, UseFilters } fr
 import { Client, ClientGrpc, ClientProxy, MessagePattern } from '@nestjs/microservices';
 import { Request, Response } from "express";
 import { timeout } from "rxjs/operators";
-import { IGrpcLogService, IGrpcService } from './grpc.interface';
-import { logMicroserviceOptions, microserviceOptions, QUEUE_CLIENT_MODULE_NAME } from './grpc.options';
+import { IGrpcLogService, IGrpcRustService, IGrpcService } from './grpc.interface';
+import { logMicroserviceOptions, microserviceOptions, QUEUE_CLIENT_MODULE_NAME, rustMicroserviceOptions } from './grpc.options';
 import { ExceptionFilter } from './rpc-exception.filter';
 
 const FIVE_SECONDS = 5000;
 
 @Controller()
 export class AppController implements OnModuleInit {
-  public constructor(@Inject(QUEUE_CLIENT_MODULE_NAME) private readonly queueClient: ClientProxy) {}
+  public constructor(@Inject(QUEUE_CLIENT_MODULE_NAME) private readonly queueClient: ClientProxy) { }
 
   @Client(microserviceOptions)
   private client: ClientGrpc;
@@ -20,9 +20,14 @@ export class AppController implements OnModuleInit {
   private logClient: ClientGrpc;
   private grpcLogService: IGrpcLogService;
 
+  @Client(rustMicroserviceOptions)
+  private rustClient: ClientGrpc;
+  private grpcRustService: IGrpcRustService;
+
   onModuleInit() {
     this.grpcService = this.client.getService<IGrpcService>('AppController');
     this.grpcLogService = this.logClient.getService<IGrpcLogService>('LogController');
+    this.grpcRustService = this.rustClient.getService<IGrpcRustService>('FibonacciService');
   }
 
   @UseFilters(new ExceptionFilter())
@@ -49,6 +54,17 @@ export class AppController implements OnModuleInit {
       (value) => res.send(value),
       (error) => console.error(error),
       () => console.info('Microservice accumulate request completed')
+    );
+  }
+
+  @UseFilters(new ExceptionFilter())
+  @Post('fibonacci')
+  public async getFibonacci(@Body("number") number: number, @Res() res: Response): Promise<void> {
+    const response$ = this.grpcRustService.calc({ number });
+    response$.pipe(timeout(FIVE_SECONDS)).subscribe(
+      (value) => res.send(value),
+      (error) => console.error(error),
+      () => console.info('Microservice fibonacci request completed')
     );
   }
 

@@ -19,6 +19,16 @@ export const logMicroserviceOptions: ClientOptions = {
   },
 };
 
+export const rustMicroserviceOptions: ClientOptions = {
+  transport: Transport.GRPC,
+  options: {
+    url: "127.0.0.1:50053",
+    package: 'fibonacci',
+    protoPath: join(__dirname, '../src/proto/fibonacci.proto'),
+  },
+};
+
+
 export const queueMicroserviceOptions: ClientOptions = {
   transport: Transport.RMQ,
   options: {
