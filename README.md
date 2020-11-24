@@ -4,6 +4,7 @@
 - yarn | npm
 - python3
 - grpc_tools
+- cargo
 - docker
 - golang
 
@@ -45,23 +46,36 @@ yarn start
 python3 ./python_grpc/server.py
 ```
 
-- Run rabbitmq container:
+- Start rust server:
 ```
 # Terminal 4
-docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
+cd rust_server_grpc
+cargo run --bin server
 ```
-
-- Start go queue consumer now or later:
+- Run rabbitmq container:
 ```
 # Terminal 5
+docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
+```
+- Start golang worker:
+```
+# Terminal 6
 cd go-rabbitmq
 go run worker.go; 
 ```
 
-# POST request
+## POST request
 ```
 curl --request POST \
 --url localhost:3001/add?querystring=query-data \
 --header 'content-type: application/json' \
 --data '{"data": [1,2,3,5,8]}'
+```
+
+## POST rust server
+```
+curl --request POST \
+--url localhost:3001/fibonacci \
+--header 'content-type: application/json' \
+--data '{"number": 7}'
 ```
