@@ -1,4 +1,5 @@
-# Multi language Nestjs microservices
+# Multi language microservices
+Proof of concept of multiple languages microservices exposed by a HTTP API and connected with AMQP and gRPC.
 
 ## Requirements
 - yarn | npm
